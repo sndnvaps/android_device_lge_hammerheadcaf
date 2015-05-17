@@ -194,3 +194,9 @@ TW_BRIGHTNESS_PATH := "/sys/devices/mdp.0/qcom\x2cmdss_fb_primary.160/leds/lcd-b
 TW_MAX_BRIGHTNESS := 255
 TW_NO_SCREEN_TIMEOUT := true
 BOARD_USE_CUSTOM_RECOVERY_FONT := \"roboto_23x41.h\"
+
+BUILD_TWRP := true 
+ifeq ($(BUILD_TWRP),true)
+BOARD_SEPOLICY_UNION += \
+	recovery.te 
+endif 
