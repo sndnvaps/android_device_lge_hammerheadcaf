@@ -406,8 +406,14 @@ static int hwc_setPowerMode(struct hwc_composer_device_1* dev, int dpy,
             value = FB_BLANK_POWERDOWN;
             break;
         case HWC_POWER_MODE_DOZE:
+            // FB_BLANK_NORMAL is being used here to map to doze mode
+            // This definition is specific to our fbdev implementation
+            value = FB_BLANK_NORMAL;
+            break;
         case HWC_POWER_MODE_DOZE_SUSPEND:
-            value = FB_BLANK_VSYNC_SUSPEND;
+            // TODO: Use FB_BLANK_VSYNC_SUSPEND here to map to doze_suspend
+            // This definition is specific to our fbdev implementation.
+            value = FB_BLANK_NORMAL;
             break;
         case HWC_POWER_MODE_NORMAL:
             value = FB_BLANK_UNBLANK;
@@ -429,7 +435,8 @@ static int hwc_setPowerMode(struct hwc_composer_device_1* dev, int dpy,
             ctx->mHPDEnabled = true;
         }
 
-        ctx->dpyAttr[dpy].isActive =  not(mode == HWC_POWER_MODE_OFF);
+        ctx->dpyAttr[dpy].isActive = not(mode == HWC_POWER_MODE_OFF);
+	//TODO: Fix this when doze suspend is fixed
 
         if(ctx->mVirtualonExtActive) {
             /* if mVirtualonExtActive is true, display hal will
@@ -680,6 +687,7 @@ static int hwc_set(hwc_composer_device_1 *dev,
     CALC_FPS();
     MDPComp::resetIdleFallBack();
     ctx->mVideoTransFlag = false;
+    ctx->mDrawLock.signal();
     //Was locked at the beginning of prepare
     ctx->mDrawLock.unlock();
     return ret;
@@ -806,6 +814,8 @@ void hwc_dump(struct hwc_composer_device_1* dev, char *buff, int buff_len)
     dumpsys_log(aBuf, "Qualcomm HWC state:\n");
     dumpsys_log(aBuf, "  MDPVersion=%d\n", ctx->mMDP.version);
     dumpsys_log(aBuf, "  DisplayPanel=%c\n", ctx->mMDP.panel);
+    dumpsys_log(aBuf, "  DynRefreshRate=%d\n",
+                ctx->dpyAttr[HWC_DISPLAY_PRIMARY].dynRefreshRate);
     for(int dpy = 0; dpy < HWC_NUM_DISPLAY_TYPES; dpy++) {
         if(ctx->mMDPComp[dpy])
             ctx->mMDPComp[dpy]->dump(aBuf);
