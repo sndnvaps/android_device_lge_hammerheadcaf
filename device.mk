@@ -183,13 +183,16 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/audio_platform_info.xml:system/etc/audio_platform_info.xml \
     $(LOCAL_PATH)/mixer_paths.xml:system/etc/mixer_paths.xml
 
+
+# Camera
 PRODUCT_PACKAGES += \
     libqomx_core \
     libmmcamera_interface \
     libmmjpeg_interface \
     camera.hammerhead \
     mm-jpeg-interface-test \
-    mm-qcamera-app
+    mm-qcamera-app \
+    Snap
 
 PRODUCT_PACKAGES += \
     keystore.msm8974
@@ -240,6 +243,14 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
     libtinyxml
+
+# Doze mode
+PRODUCT_PACKAGES += \
+    HammerheadDoze
+
+# Recovery
+PRODUCT_PACKAGES += \
+    librecovery_updater_hammerhead
 
 # I/O Scheduler
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -305,10 +316,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.qti.sensors.pedometer=false \
     ro.qti.sensors.pam=false \
     ro.qti.sdk.sensors.gestures=false
-
-# Doze mode
-PRODUCT_PACKAGES += \
-    HammerheadDoze
 
 # Enable some debug messages by default
 PRODUCT_PROPERTY_OVERRIDES += \

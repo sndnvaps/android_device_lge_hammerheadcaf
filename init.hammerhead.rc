@@ -34,8 +34,11 @@ on init
     symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
 
+    write /sys/block/zram0/comp_algorithm lz4
+
 on fs
     mount_all ./fstab.hammerhead
+    swapon_all ./fstab.hammerhead
     restorecon_recursive /persist
 
 on early-boot
@@ -129,6 +132,13 @@ on boot
     write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 1
     write /sys/module/lowmemorykiller/parameters/vmpressure_file_min 53059
 
+    # Set per_process_reclaim tuning parameters
+    write /sys/module/process_reclaim/parameters/enable_process_reclaim 1
+    write /sys/module/process_reclaim/parameters/pressure_min 50
+    write /sys/module/process_reclaim/parameters/pressure_max 70
+    write /sys/module/process_reclaim/parameters/per_swap_size 512
+    write /sys/module/process_reclaim/parameters/swap_opt_eff 30
+
 on post-fs-data
     write /sys/kernel/boot_adsp/boot 1
 
@@ -193,6 +203,9 @@ on property:init.svc.wpa_supplicant=stopped
 on property:sys.boot_completed=1
     # enable slimport detection
     write /sys/module/slimport/parameters/enable_irq 1
+
+    # enable logging of wake up reasons to kernel logs
+    write /sys/module/msm_show_resume_irq/parameters/debug_mask 1
 
 on property:persist.sys.ssr.enable_ramdumps=1
     # Subsytem Ramdump collection
